@@ -3,14 +3,15 @@
  * Handles real-time cloud synchronization, offline caching, and automatic fallback.
  */
 
-// Default Firebase Configuration (Users can replace this or configure via UI)
+// Default Firebase Configuration
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyAE8odRWtfQkNEw1BqQRfUfSAaLqxUtblk",
+  authDomain: "transactioncounter-eb4a5.firebaseapp.com",
+  projectId: "transactioncounter-eb4a5",
+  storageBucket: "transactioncounter-eb4a5.firebasestorage.app",
+  messagingSenderId: "382902417504",
+  appId: "1:382902417504:web:ba719730e96e637200eb05",
+  measurementId: "G-JMET5T142B"
 };
 
 // Storage key for user-provided Firebase config in localStorage
