@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="ATM Free Transaction Counter for Canara Bank & SBI cards with 5 free limit and monthly auto-reset">
+  <title>ATM Free Transaction Counter | ATM కౌంటర్</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+  <div class="bg-glow glow-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-branding">
+        <div class="app-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <line x1="2" y1="10" x2="22" y2="10"></line>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">ATM Counter</h1>
+          <p class="app-subtitle">నెలవారీ 5 ఉచిత ATM లావాదేవీల ట్రాకర్</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound" aria-label="Toggle Sound">
+          <svg id="soundOnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="soundOffIcon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+        <button id="settingsBtn" class="icon-btn" title="Settings & Cards" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Month Navigation Bar & Monthly Status -->
+    <div class="month-bar-card glass-panel">
+      <div class="month-selector">
+        <button id="prevMonthBtn" class="month-nav-btn" title="Previous Month" aria-label="Previous Month">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="current-month-info">
+          <span class="month-label" id="activeMonthDisplay">September 2026</span>
+          <span class="month-badge" id="currentMonthBadge">Active Month (ప్రస్తుత నెల)</span>
+        </div>
+        <button id="nextMonthBtn" class="month-nav-btn" title="Next Month" aria-label="Next Month">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      <div class="month-summary-pills">
+        <div class="summary-pill">
+          <span class="pill-label">Total Free Left</span>
+          <span class="pill-val highlight-green" id="totalFreeLeftPill">10 / 10 Free</span>
+        </div>
+        <div class="summary-pill">
+          <span class="pill-label">Total Withdrawn</span>
+          <span class="pill-val" id="totalWithdrawnPill">₹0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Quick Tab Switcher -->
+    <div class="mobile-tabs-container">
+      <button class="mobile-tab-btn active" data-tab="all">
+        <span>Both Cards (రెండు)</span>
+      </button>
+      <button class="mobile-tab-btn tab-canara" data-tab="my_card">
+        <span>Naa Card (Canara)</span>
+      </button>
+      <button class="mobile-tab-btn tab-sbi" data-tab="mummy_card">
+        <span>Mummy Card (SBI)</span>
+      </button>
+    </div>
+
+    <!-- Cards Section -->
+    <main class="cards-grid">
+      <!-- Card 1: Naa ATM Card (Canara Bank) -->
+      <section class="atm-card-wrapper" id="cardContainer_my_card">
+        <div class="atm-visual-card card-theme-canara" id="cardVisual_my_card">
+          <div class="card-chip-row">
+            <div class="emv-chip">
+              <div class="chip-line"></div>
+              <div class="chip-line"></div>
+              <div class="chip-line"></div>
+            </div>
+            <div class="contactless-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M8.5 16.5a5 5 0 0 1 0-9"></path>
+                <path d="M12 19a8.5 8.5 0 0 0 0-14"></path>
+                <path d="M15.5 21.5a12 12 0 0 0 0-19"></path>
+              </svg>
+            </div>
+            <div class="card-bank-badge canara-badge" id="bankDisplay_my_card">CANARA BANK</div>
+          </div>
+
+          <div class="card-middle">
+            <div class="card-holder-tag">User Card • నా కార్డు</div>
+            <div class="card-holder-name" id="nameDisplay_my_card">Naa ATM Card</div>
+          </div>
+
+          <div class="card-bottom-row">
+            <div class="card-number-mask" id="numberDisplay_my_card">•••• 4821</div>
+            <div class="card-network-logo">
+              <span class="rupay-text">RuPay</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Control Panel for Card 1 -->
+        <div class="card-dashboard glass-panel">
+          <div class="dashboard-header">
+            <div class="quota-status">
+              <span class="status-indicator" id="statusDot_my_card"></span>
+              <span class="status-text" id="statusText_my_card">5 Free Transactions Available</span>
+            </div>
+            <div class="quota-count">
+              <span class="count-big" id="countDisplay_my_card">0</span>
+              <span class="count-limit">/ 5 Free</span>
+            </div>
+          </div>
+
+          <!-- 5 Steps Quota Progress Indicator -->
+          <div class="quota-steps" id="quotaSteps_my_card">
+            <div class="step-dot" data-step="1">1</div>
+            <div class="step-dot" data-step="2">2</div>
+            <div class="step-dot" data-step="3">3</div>
+            <div class="step-dot" data-step="4">4</div>
+            <div class="step-dot" data-step="5">5</div>
+          </div>
+
+          <!-- Alert banner if limit exceeded -->
+          <div class="limit-warning-banner hidden" id="warningBanner_my_card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span id="warningMsg_my_card">5 ఫ్రీ లిమిట్ పూర్తయింది! తర్వాతి లావాదేవీలకు ఛార్జీలు పడతాయి (₹21+GST).</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons-group">
+            <button class="btn-increment btn-canara-accent" id="quickAddBtn_my_card">
+              <span class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </span>
+              <span class="btn-text-wrap">
+                <span class="btn-primary-text">+ 1 Transaction Done</span>
+                <span class="btn-sub-text">డ్రా చేసాను (+1 కౌంట్)</span>
+              </span>
+            </button>
+
+            <div class="secondary-actions">
+              <button class="btn-secondary" id="customAddBtn_my_card" title="Add with Amount & Note">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Add Details (₹)</span>
+              </button>
+              <button class="btn-secondary btn-undo" id="undoBtn_my_card" title="Undo last transaction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span>Undo (-1)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Card 2: Mummy ATM Card (SBI Bank) -->
+      <section class="atm-card-wrapper" id="cardContainer_mummy_card">
+        <div class="atm-visual-card card-theme-sbi" id="cardVisual_mummy_card">
+          <div class="card-chip-row">
+            <div class="emv-chip">
+              <div class="chip-line"></div>
+              <div class="chip-line"></div>
+              <div class="chip-line"></div>
+            </div>
+            <div class="contactless-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M8.5 16.5a5 5 0 0 1 0-9"></path>
+                <path d="M12 19a8.5 8.5 0 0 0 0-14"></path>
+                <path d="M15.5 21.5a12 12 0 0 0 0-19"></path>
+              </svg>
+            </div>
+            <div class="card-bank-badge sbi-badge" id="bankDisplay_mummy_card">SBI BANK</div>
+          </div>
+
+          <div class="card-middle">
+            <div class="card-holder-tag">Mummy Card • మమ్మీ కార్డు</div>
+            <div class="card-holder-name" id="nameDisplay_mummy_card">Mummy's ATM Card</div>
+          </div>
+
+          <div class="card-bottom-row">
+            <div class="card-number-mask" id="numberDisplay_mummy_card">•••• 8192</div>
+            <div class="card-network-logo">
+              <span class="visa-text">VISA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Control Panel for Card 2 -->
+        <div class="card-dashboard glass-panel">
+          <div class="dashboard-header">
+            <div class="quota-status">
+              <span class="status-indicator" id="statusDot_mummy_card"></span>
+              <span class="status-text" id="statusText_mummy_card">5 Free Transactions Available</span>
+            </div>
+            <div class="quota-count">
+              <span class="count-big" id="countDisplay_mummy_card">0</span>
+              <span class="count-limit">/ 5 Free</span>
+            </div>
+          </div>
+
+          <!-- 5 Steps Quota Progress Indicator -->
+          <div class="quota-steps" id="quotaSteps_mummy_card">
+            <div class="step-dot" data-step="1">1</div>
+            <div class="step-dot" data-step="2">2</div>
+            <div class="step-dot" data-step="3">3</div>
+            <div class="step-dot" data-step="4">4</div>
+            <div class="step-dot" data-step="5">5</div>
+          </div>
+
+          <!-- Alert banner if limit exceeded -->
+          <div class="limit-warning-banner hidden" id="warningBanner_mummy_card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span id="warningMsg_mummy_card">5 ఫ్రీ లిమిట్ పూర్తయింది! తర్వాతి లావాదేవీలకు ఛార్జీలు పడతాయి (₹21+GST).</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons-group">
+            <button class="btn-increment btn-sbi-accent" id="quickAddBtn_mummy_card">
+              <span class="btn-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </span>
+              <span class="btn-text-wrap">
+                <span class="btn-primary-text">+ 1 Transaction Done</span>
+                <span class="btn-sub-text">డ్రా చేసాను (+1 కౌంట్)</span>
+              </span>
+            </button>
+
+            <div class="secondary-actions">
+              <button class="btn-secondary" id="customAddBtn_mummy_card" title="Add with Amount & Note">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                <span>Add Details (₹)</span>
+              </button>
+              <button class="btn-secondary btn-undo" id="undoBtn_mummy_card" title="Undo last transaction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span>Undo (-1)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Transaction History Section -->
+    <section class="history-section glass-panel">
+      <div class="history-header">
+        <div class="history-title-wrap">
+          <div class="history-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h2 class="history-title">Transaction History</h2>
+            <p class="history-sub" id="historyMonthSub">ఈ నెలలో చేసిన లావాదేవీల వివరాలు</p>
+          </div>
+        </div>
+
+        <div class="history-filter-controls">
+          <select id="cardFilterSelect" class="styled-select" aria-label="Filter transactions by card">
+            <option value="all">All Cards (రెండు కార్డులు)</option>
+            <option value="my_card">Naa Card (Canara Bank)</option>
+            <option value="mummy_card">Mummy Card (SBI Bank)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="transaction-list" id="transactionList">
+        <!-- Dynamic list of transactions -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>💡 ATM Rule: 5 free transactions per month per debit card (Canara & SBI). Built for quick cash withdrawal tracking.</p>
+    </footer>
+  </div>
+
+  <!-- Modal: Add Transaction with Details (Amount, Note, Time) -->
+  <div class="modal-overlay hidden" id="addDetailModal">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalCardTitle">Add Transaction Details</h3>
+        <button class="modal-close-btn" id="closeDetailModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="addDetailForm" class="modal-form">
+        <input type="hidden" id="modalCardId" value="">
+        
+        <div class="form-group">
+          <label for="detailAmount">Withdrawn Amount (తీసుకున్న మొత్తం ₹)</label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">₹</span>
+            <input type="number" id="detailAmount" inputmode="numeric" placeholder="e.g. 5000" min="0" step="100" class="styled-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="detailNote">ATM Location / Note (ATM లేదా కారణం)</label>
+          <input type="text" id="detailNote" placeholder="e.g. Bus stand Canara ATM, SBI ATM..." class="styled-input">
+        </div>
+
+        <div class="form-group">
+          <label for="detailDateTime">Date & Time</label>
+          <input type="datetime-local" id="detailDateTime" class="styled-input">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelDetailBtn">Cancel</button>
+          <button type="submit" class="btn-primary">Save & Increment (+1)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Settings (Card names, Bank names, Reset Month, Backup) -->
+  <div class="modal-overlay hidden" id="settingsModal">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 class="modal-title">Settings & Card Customization</h3>
+        <button class="modal-close-btn" id="closeSettingsModalBtn" aria-label="Close settings">&times;</button>
+      </div>
+
+      <div class="settings-content">
+        <!-- Card 1 Config -->
+        <div class="settings-section">
+          <h4>Card 1 (Your Card - Canara Bank)</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="settingName_my_card">Card Label / Name</label>
+              <input type="text" id="settingName_my_card" class="styled-input" value="Naa ATM Card">
+            </div>
+            <div class="form-group">
+              <label for="settingBank_my_card">Bank Name</label>
+              <input type="text" id="settingBank_my_card" class="styled-input" value="CANARA BANK">
+            </div>
+            <div class="form-group">
+              <label for="settingNumber_my_card">Last 4 Digits</label>
+              <input type="text" id="settingNumber_my_card" class="styled-input" value="•••• 4821" maxlength="10">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 Config -->
+        <div class="settings-section">
+          <h4>Card 2 (Mummy's Card - SBI Bank)</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="settingName_mummy_card">Card Label / Name</label>
+              <input type="text" id="settingName_mummy_card" class="styled-input" value="Mummy's ATM Card">
+            </div>
+            <div class="form-group">
+              <label for="settingBank_mummy_card">Bank Name</label>
+              <input type="text" id="settingBank_mummy_card" class="styled-input" value="SBI BANK">
+            </div>
+            <div class="form-group">
+              <label for="settingNumber_mummy_card">Last 4 Digits</label>
+              <input type="text" id="settingNumber_mummy_card" class="styled-input" value="•••• 8192" maxlength="10">
+            </div>
+          </div>
+        </div>
+
+        <!-- Data & Monthly Operations -->
+        <div class="settings-section">
+          <h4>Monthly & Data Management</h4>
+          <div class="settings-btn-grid">
+            <button class="btn-danger-outline" id="resetCurrentMonthBtn">
+              🔄 Reset This Month Counters to 0
+            </button>
+            <button class="btn-secondary" id="exportDataBtn">
+              📥 Backup / Export Data (JSON)
+            </button>
+            <label class="btn-secondary file-upload-btn">
+              📤 Restore / Import Data
+              <input type="file" id="importDataInput" accept=".json" class="hidden">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Canvas for Confetti -->
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <script src="app.js"></script>
+</body>
+</html>
