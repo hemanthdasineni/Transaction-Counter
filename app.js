@@ -78,7 +78,7 @@ function loadState() {
   }
 }
 
-// Save state to LocalStorage
+// Save state to LocalStorage and Cloud Database (Firebase)
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -86,7 +86,40 @@ function saveState() {
       transactions: state.transactions
     }));
   } catch (err) {
-    console.error('Error saving state:', err);
+    console.error('Error saving state to localStorage:', err);
+  }
+
+  // Real-time Cloud Sync to Firebase Firestore
+  if (typeof syncStateToCloud === 'function') {
+    syncStateToCloud({
+      cards: state.cards,
+      transactions: state.transactions
+    });
+  }
+}
+
+// Callback when remote data updates arrive from Firebase Firestore
+function handleRemoteCloudData(remoteData) {
+  if (!remoteData) return;
+  let hasChanges = false;
+
+  if (Array.isArray(remoteData.cards) && remoteData.cards.length > 0) {
+    state.cards = remoteData.cards;
+    hasChanges = true;
+  }
+  if (Array.isArray(remoteData.transactions)) {
+    state.transactions = remoteData.transactions;
+    hasChanges = true;
+  }
+
+  if (hasChanges) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        cards: state.cards,
+        transactions: state.transactions
+      }));
+    } catch (e) {}
+    renderApp();
   }
 }
 
@@ -812,11 +845,150 @@ function initEvents() {
   if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
   if (importDataInput) importDataInput.addEventListener('change', importData);
 
+  // Modal: Firebase Cloud Database
+  const cloudSyncBadge = document.getElementById('cloudSyncBadge');
+  const openFirebaseConfigBtn = document.getElementById('openFirebaseConfigBtn');
+  const firebaseModal = document.getElementById('firebaseModal');
+  const closeFirebaseModalBtn = document.getElementById('closeFirebaseModalBtn');
+  const cancelFirebaseBtn = document.getElementById('cancelFirebaseBtn');
+  const saveAndConnectFirebaseBtn = document.getElementById('saveAndConnectFirebaseBtn');
+  const disconnectFirebaseBtn = document.getElementById('disconnectFirebaseBtn');
+
+  function openFirebaseModal() {
+    if (firebaseModal) {
+      // Pre-fill fields if saved config exists
+      const config = typeof getActiveFirebaseConfig === 'function' ? getActiveFirebaseConfig() : null;
+      if (config) {
+        document.getElementById('fbApiKey').value = config.apiKey || '';
+        document.getElementById('fbProjectId').value = config.projectId || '';
+        document.getElementById('fbAuthDomain').value = config.authDomain || '';
+        document.getElementById('fbAppId').value = config.appId || '';
+        
+        if (config.apiKey && config.projectId) {
+          document.getElementById('firebaseJsonConfig').value = JSON.stringify(config, null, 2);
+        }
+      }
+
+      const fbBannerDot = document.getElementById('fbBannerDot');
+      const fbBannerText = document.getElementById('fbBannerText');
+      if (typeof isFirebaseConfigured === 'function' && isFirebaseConfigured()) {
+        fbBannerDot.className = 'status-indicator status-dot-safe';
+        fbBannerText.textContent = 'Firebase Cloud Synced & Active (డేటా క్లౌడ్‌లో సేఫ్ గా ఉంది)';
+      } else {
+        fbBannerDot.className = 'status-indicator status-dot-warn';
+        fbBannerText.textContent = 'Local Mode Active (Firebase కనెక్ట్ చేయండి)';
+      }
+
+      firebaseModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeFirebaseModal() {
+    if (firebaseModal) {
+      firebaseModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function handleSaveFirebase() {
+    let config = {};
+    const rawJson = document.getElementById('firebaseJsonConfig').value.trim();
+
+    if (rawJson) {
+      try {
+        // Handle JS object format like apiKey: "..." or JSON format
+        let cleaned = rawJson;
+        if (cleaned.includes('const firebaseConfig =')) {
+          cleaned = cleaned.replace(/const firebaseConfig\s*=\s*/, '').replace(/;$/, '');
+        }
+        // Normalize keys without quotes to valid JSON
+        if (!cleaned.startsWith('{')) {
+          const match = cleaned.match(/\{[\s\S]*\}/);
+          if (match) cleaned = match[0];
+        }
+        // Try direct JSON.parse first, or function eval safely
+        try {
+          config = JSON.parse(cleaned);
+        } catch (e) {
+          // If relaxed JS object syntax
+          config = Function('"use strict";return (' + cleaned + ')')();
+        }
+      } catch (err) {
+        console.warn('Could not parse JSON snippet, checking manual fields:', err);
+      }
+    }
+
+    // Fallback to manual input fields if not found in JSON
+    if (!config.apiKey || !config.projectId) {
+      config = {
+        apiKey: document.getElementById('fbApiKey').value.trim(),
+        projectId: document.getElementById('fbProjectId').value.trim(),
+        authDomain: document.getElementById('fbAuthDomain').value.trim(),
+        appId: document.getElementById('fbAppId').value.trim()
+      };
+    }
+
+    if (!config.apiKey || !config.projectId) {
+      alert('దయచేసి Firebase API Key మరియు Project ID తప్పనిసరిగా నమోదు చేయండి.');
+      return;
+    }
+
+    if (typeof saveFirebaseConfig === 'function') {
+      saveFirebaseConfig(config);
+      showToast('Firebase Config Saved! Connecting...', 'info');
+      closeFirebaseModal();
+
+      if (typeof initFirebaseSync === 'function') {
+        initFirebaseSync(handleRemoteCloudData).then(connected => {
+          if (connected) {
+            showToast('Cloud Database Connected! 🎉', 'success');
+            // Immediately sync current state to cloud
+            syncStateToCloud({
+              cards: state.cards,
+              transactions: state.transactions
+            });
+          } else {
+            showToast('Firebase connection failed. Check credentials.', 'warning');
+          }
+        });
+      }
+    }
+  }
+
+  function handleDisconnectFirebase() {
+    if (confirm('Firebase డిస్‌కనెక్ట్ చేయాలనుకుంటున్నారా? డేటా బ్రౌజర్ లోకల్ స్టోరేజ్ లో మాత్రమే ఉంటుంది.')) {
+      if (typeof clearFirebaseConfig === 'function') {
+        clearFirebaseConfig();
+      }
+      document.getElementById('firebaseJsonConfig').value = '';
+      document.getElementById('fbApiKey').value = '';
+      document.getElementById('fbProjectId').value = '';
+      document.getElementById('fbAuthDomain').value = '';
+      document.getElementById('fbAppId').value = '';
+      showToast('Disconnected from Firebase (Local mode active)', 'info');
+      closeFirebaseModal();
+    }
+  }
+
+  if (cloudSyncBadge) cloudSyncBadge.addEventListener('click', openFirebaseModal);
+  if (openFirebaseConfigBtn) {
+    openFirebaseConfigBtn.addEventListener('click', () => {
+      closeSettingsModal();
+      openFirebaseModal();
+    });
+  }
+  if (closeFirebaseModalBtn) closeFirebaseModalBtn.addEventListener('click', closeFirebaseModal);
+  if (cancelFirebaseBtn) cancelFirebaseBtn.addEventListener('click', closeFirebaseModal);
+  if (saveAndConnectFirebaseBtn) saveAndConnectFirebaseBtn.addEventListener('click', handleSaveFirebase);
+  if (disconnectFirebaseBtn) disconnectFirebaseBtn.addEventListener('click', handleDisconnectFirebase);
+
   // Close modals on overlay backdrop click
   window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-overlay')) {
       closeDetailModal();
       closeSettingsModal();
+      closeFirebaseModal();
     }
   });
 
@@ -838,4 +1010,10 @@ document.addEventListener('DOMContentLoaded', () => {
   loadState();
   initEvents();
   renderApp();
+
+  // Initialize Firebase Cloud Database Sync
+  if (typeof initFirebaseSync === 'function') {
+    initFirebaseSync(handleRemoteCloudData);
+  }
 });
+

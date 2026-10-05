@@ -37,6 +37,10 @@
       </div>
 
       <div class="header-controls">
+        <button id="cloudSyncBadge" class="cloud-sync-badge status-local" title="Cloud Database Connection Status">
+          <span id="cloudSyncDot" class="sync-dot"></span>
+          <span id="cloudSyncText">Local Mode</span>
+        </button>
         <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound" aria-label="Toggle Sound">
           <svg id="soundOnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -399,6 +403,17 @@
           </div>
         </div>
 
+        <!-- Cloud Database (Firebase) Section -->
+        <div class="settings-section">
+          <h4>☁️ Cloud Database (Firebase Firestore)</h4>
+          <p class="settings-hint">డేటా పోకుండా క్లౌడ్ లో సేఫ్ గా సేవ్ చేసుకోవడానికి మరియు మొబైల్ & ల్యాప్‌టాప్ లో రియల్‌టైమ్ సింక్ కి Firebase కనెక్ట్ చేయండి.</p>
+          <div class="settings-btn-grid">
+            <button type="button" class="btn-primary-outline" id="openFirebaseConfigBtn">
+              🔥 Firebase Database Setup & Sync
+            </button>
+          </div>
+        </div>
+
         <!-- Data & Monthly Operations -->
         <div class="settings-section">
           <h4>Monthly & Data Management</h4>
@@ -423,12 +438,87 @@
     </div>
   </div>
 
+  <!-- Modal: Firebase Cloud Database Configuration -->
+  <div class="modal-overlay hidden" id="firebaseModal">
+    <div class="modal-card glass-panel modal-wide">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon-badge">🔥</span>
+          <h3 class="modal-title">Firebase Cloud Database Setup</h3>
+        </div>
+        <button class="modal-close-btn" id="closeFirebaseModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="firebase-modal-content">
+        <div class="info-alert-box">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">
+            <strong>మీ డేటా ఎప్పటికీ పోదు:</strong> Firebase Firestore కనెక్ట్ చేస్తే మీరు ఎక్కడ లావాదేవీ యాడ్ చేసినా అన్ని డివైస్‌లలో ఆటోమేటిక్ గా రియల్‌టైమ్ లో అప్‌డేట్ అవుతుంది.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="firebaseJsonConfig">Paste Firebase Web Config (JSON or JavaScript snippet)</label>
+          <textarea id="firebaseJsonConfig" rows="5" class="styled-textarea" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "your-app.firebaseapp.com",
+  "projectId": "your-project-id",
+  "storageBucket": "your-app.appspot.com",
+  "messagingSenderId": "123456789",
+  "appId": "1:123456789:web:abcdef"
+}'></textarea>
+          <span class="input-hint">Firebase Console -> Project Settings -> General -> Your apps (Web app) లో లభించే `firebaseConfig` ని ఇక్కడ పేస్ట్ చేయవచ్చు.</span>
+        </div>
+
+        <div class="divider-text">లేదా వివరాలను మాన్యువల్ గా నమోదు చేయండి</div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fbApiKey">API Key</label>
+            <input type="text" id="fbApiKey" class="styled-input" placeholder="AIzaSy...">
+          </div>
+          <div class="form-group">
+            <label for="fbProjectId">Project ID</label>
+            <input type="text" id="fbProjectId" class="styled-input" placeholder="atm-counter-xxxx">
+          </div>
+          <div class="form-group">
+            <label for="fbAuthDomain">Auth Domain</label>
+            <input type="text" id="fbAuthDomain" class="styled-input" placeholder="atm-counter-xxxx.firebaseapp.com">
+          </div>
+          <div class="form-group">
+            <label for="fbAppId">App ID</label>
+            <input type="text" id="fbAppId" class="styled-input" placeholder="1:123456789:web:abcdef">
+          </div>
+        </div>
+
+        <div class="firebase-status-banner" id="firebaseStatusBanner">
+          <span class="status-indicator" id="fbBannerDot"></span>
+          <span id="fbBannerText">Local Mode Active</span>
+        </div>
+      </div>
+
+      <div class="modal-actions modal-actions-space-between">
+        <button type="button" class="btn-danger-outline" id="disconnectFirebaseBtn">Clear / Disconnect</button>
+        <div class="action-buttons-right">
+          <button type="button" class="btn-secondary" id="cancelFirebaseBtn">Cancel</button>
+          <button type="button" class="btn-primary" id="saveAndConnectFirebaseBtn">Save & Connect Cloud</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="toast-container"></div>
 
   <!-- Canvas for Confetti -->
   <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
 
+  <!-- Firebase SDKs (Compat version for vanilla JS) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <!-- App Scripts -->
+  <script src="firebase-config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
